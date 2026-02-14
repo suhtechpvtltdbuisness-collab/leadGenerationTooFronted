@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
+import LeadsPage from './components/LeadsPage';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -15,7 +16,8 @@ function App() {
 
         <div className="flex-1 bg-gray-50">
           {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab !== 'dashboard' && (
+          {activeTab === 'leads' && <LeadsPage />}
+          {activeTab !== 'dashboard' && activeTab !== 'leads' && (
             <div className="flex flex-col items-center justify-center min-h-[400px] p-10">
               <h2 className="text-3xl font-bold text-gray-900 mb-3">Coming Soon</h2>
               <p className="text-base text-gray-500">This section is under development</p>
