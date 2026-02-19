@@ -45,8 +45,8 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
       }
       const result = await response.json();
       if (result.success) {
-        setResults(result.data || []);
-        if (result.data?.length === 0) {
+        setResults(result.results || []);
+        if (result.results?.length === 0) {
           setError("No hospitals found for this search");
         }
       } else {

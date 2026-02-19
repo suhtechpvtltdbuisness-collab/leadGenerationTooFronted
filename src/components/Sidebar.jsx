@@ -6,10 +6,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
   useEffect(() => {
     fetchRecentLeads();
-
-    // Refresh leads when Sidebar is mounted or tab changes to dashboard
-    const interval = setInterval(fetchRecentLeads, 10000); // Polling every 10s
-    return () => clearInterval(interval);
   }, []);
 
   const fetchRecentLeads = async () => {
