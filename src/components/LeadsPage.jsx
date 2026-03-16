@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from "react";
+import ToastMessage from "./ToastMessage";
 
 const LeadsPage = () => {
   const [leads, setLeads] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletingLeadId, setDeletingLeadId] = useState(null);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     fetchLeads();
   }, []);
+
+  useEffect(() => {
+    if (!toast) return;
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+  };
 
   const fetchLeads = async () => {
     setIsLoading(true);
@@ -28,8 +45,61 @@ const LeadsPage = () => {
     }
   };
 
+  const handleDeleteLead = async (lead) => {
+    const leadId = lead?._id;
+
+    if (!leadId) {
+      showToast("This lead cannot be deleted because ID is missing.");
+      return;
+    }
+
+    const shouldDelete = window.confirm(
+      `Delete lead "${lead.name}"? This action cannot be undone.`,
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    setDeletingLeadId(leadId);
+
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+      const response = await fetch(`${baseUrl}/api/leads/${leadId}`, {
+        method: "DELETE",
+      });
+
+      const responseText = await response.text();
+      let result = null;
+
+      if (responseText) {
+        try {
+          result = JSON.parse(responseText);
+        } catch {
+          result = null;
+        }
+      }
+
+      if (!response.ok || (result && result.success === false)) {
+        throw new Error(
+          result?.error || `Failed to delete lead (status: ${response.status})`,
+        );
+      }
+
+      setLeads((prevLeads) => prevLeads.filter((item) => item._id !== leadId));
+      showToast(`Lead "${lead.name}" deleted successfully.`, "success");
+    } catch (err) {
+      showToast(err.message || "Failed to delete lead");
+      console.error("Delete error:", err);
+    } finally {
+      setDeletingLeadId(null);
+    }
+  };
+
   return (
     <div className="p-8">
+      <ToastMessage message={toast?.message} type={toast?.type} />
+
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Leads Management</h1>
@@ -144,8 +214,13 @@ const LeadsPage = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-gray-400 hover:text-blue-600 transition-colors">
-                        <span className="text-xl">⋮</span>
+                      <button
+                        onClick={() => handleDeleteLead(lead)}
+                        disabled={deletingLeadId === lead._id || !lead._id}
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title={!lead._id ? "Lead ID missing" : "Delete lead"}
+                      >
+                        {deletingLeadId === lead._id ? "Deleting..." : "Delete"}
                       </button>
                     </td>
                   </tr>

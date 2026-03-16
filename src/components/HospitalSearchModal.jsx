@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ToastMessage from "./ToastMessage";
 
 const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
   const [query, setQuery] = useState("");
@@ -7,12 +8,28 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [selectedIndices, setSelectedIndices] = useState([]);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   useEffect(() => {
     if (!isOpen) {
       setQuery("");
       setResults([]);
       setSelectedIndices([]);
+      setToast(null);
       return;
     }
   }, [isOpen]);
@@ -107,8 +124,10 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
 
       const result = await response.json();
       if (result.success) {
-        alert(`Successfully saved ${result.insertedCount} leads!`);
-        onClose();
+        showToast(`Successfully saved ${result.insertedCount} leads!`, "success");
+        setTimeout(() => {
+          onClose();
+        }, 1200);
       } else {
         throw new Error(result.error || "Failed to save leads");
       }
@@ -124,6 +143,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+      <ToastMessage message={toast?.message} type={toast?.type} />
       <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
         {/* Header/Search Input */}
         <div className="p-6 border-b border-gray-100 bg-gray-50/50">

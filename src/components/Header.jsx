@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import HospitalSearchModal from './HospitalSearchModal';
+import ToastMessage from './ToastMessage';
 
 const Header = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
 
     const handleHospitalSelect = (hospital) => {
         console.log('Selected Hospital:', hospital);
-        alert(`You selected: ${hospital.name}`);
+        showToast(`You selected: ${hospital.name}`, 'success');
         setIsSearchOpen(false);
     };
 
     return (
         <header className="bg-white px-8 py-4 sticky top-0 z-40 border-b border-gray-100 shadow-sm">
+            <ToastMessage message={toast?.message} type={toast?.type} />
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Website Development Lead Dashboard
