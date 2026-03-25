@@ -2,11 +2,6 @@ import React, { useState, useEffect } from "react";
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const [recentLeads, setRecentLeads] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchRecentLeads();
-  }, []);
 
   const fetchRecentLeads = async () => {
     try {
@@ -20,6 +15,10 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       console.error("Error fetching leads in sidebar:", error);
     }
   };
+
+  useEffect(() => {
+    fetchRecentLeads();
+  }, []);
 
   const menuItems = [
     { id: "dashboard", icon: "🏠", label: "Dashboard" },

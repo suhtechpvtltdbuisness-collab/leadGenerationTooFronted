@@ -164,6 +164,12 @@ const LeadsPage = () => {
                     Rating
                   </th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Contact Info
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Links
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
@@ -199,6 +205,41 @@ const LeadsPage = () => {
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
                         ⭐ {lead.rating}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-xs text-gray-900 font-medium">
+                        {lead.phoneNumber || "No Phone"}
+                      </div>
+                      <div className="text-[10px] text-gray-500">
+                        {lead.email || "No Email"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        {lead.websiteLink && lead.websiteLink !== "No Website" && (
+                          <a
+                            href={lead.websiteLink.startsWith('http') ? lead.websiteLink : `https://${lead.websiteLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-blue-600 hover:underline flex items-center gap-1"
+                          >
+                            <span>🌐</span> Website
+                          </a>
+                        )}
+                        {lead.mapsLink && (
+                          <a
+                            href={lead.mapsLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-red-600 hover:underline flex items-center gap-1"
+                          >
+                            <span>📍</span> Google Maps
+                          </a>
+                        )}
+                        {!lead.websiteLink && !lead.mapsLink && (
+                          <span className="text-[10px] text-gray-400">No Links</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">

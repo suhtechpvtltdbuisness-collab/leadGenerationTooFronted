@@ -96,10 +96,14 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
     setIsSaving(true);
     setError(null);
 
-    // Format payload as requested: [ { "name": "...", "rating": "..." }, ... ]
     const payload = selectedIndices.map((index) => ({
       name: results[index].name,
       rating: results[index].rating,
+      address: results[index].address,
+      phoneNumber: results[index].phoneNumber,
+      websiteLink: results[index].websiteLink,
+      email: results[index].email,
+      mapsLink: results[index].mapsLink,
     }));
 
     try {
@@ -254,6 +258,15 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                     <th className="px-6 py-4 text-sm font-semibold text-gray-700">
                       PHONE
                     </th>
+                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                      EMAIL
+                    </th>
+                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                      WEBSITE
+                    </th>
+                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                      GOOGLE LINK
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -278,20 +291,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                         {index + 1}
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        <div className="flex flex-col">
-                          <span>{hospital.name}</span>
-                          {hospital.website !== "No Website" && (
-                            <a
-                              href={hospital.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-xs text-blue-500 hover:underline inline-block mt-1"
-                            >
-                              Visit Website
-                            </a>
-                          )}
-                        </div>
+                        {hospital.name}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -305,7 +305,41 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                         {hospital.address}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                        {hospital.phone}
+                        {hospital.phoneNumber || "No Phone"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                        {hospital.email || "No Email"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                        {hospital.websiteLink && hospital.websiteLink !== "No Website" ? (
+                          <a
+                            href={hospital.websiteLink.startsWith('http') ? hospital.websiteLink : `https://${hospital.websiteLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                          >
+                            Visit Website
+                          </a>
+                        ) : (
+                          "No Website"
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                        {hospital.mapsLink ? (
+                          <a
+                            href={hospital.mapsLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-800 hover:underline transition-colors"
+                          >
+                            <span>📍</span>
+                            Maps Link
+                          </a>
+                        ) : (
+                          "No Link"
+                        )}
                       </td>
                     </tr>
                   ))}
