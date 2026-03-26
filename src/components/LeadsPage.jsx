@@ -156,101 +156,102 @@ const LeadsPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50/50 border-b border-gray-100">
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Lead Info
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    SR NO
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Rating
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    NAME
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Contact Info
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    RATING
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Links
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    ADDRESS
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Status
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    PHONE
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Date Added
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    EMAIL
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">
-                    Actions
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    WEBSITE
+                  </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    GOOGLE LINK
+                  </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    DATE ADDED
+                  </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-700 text-right">
+                    ACTIONS
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-100">
                 {leads.map((lead, index) => (
                   <tr
                     key={lead._id || index}
-                    className="hover:bg-gray-50/50 transition-colors group"
+                    className="hover:bg-blue-50/50 transition-colors group"
                   >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">
-                          {lead.name.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold text-gray-900">
-                            {lead.name}
-                          </div>
-                          <div className="text-[11px] text-gray-500">
-                            Hospital/Medical Center
-                          </div>
-                        </div>
-                      </div>
+                    <td className="px-6 py-4 text-sm text-gray-500 font-medium">
+                      {index + 1}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                      {lead.name}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
                         ⭐ {lead.rating}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-xs text-gray-900 font-medium">
-                        {lead.phoneNumber || "No Phone"}
-                      </div>
-                      <div className="text-[10px] text-gray-500">
-                        {lead.email || "No Email"}
-                      </div>
+                    <td
+                      className="px-6 py-4 text-sm text-gray-600 truncate max-w-[200px]"
+                      title={lead.address}
+                    >
+                      {lead.address || "No Address"}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1">
-                        {lead.websiteLink && lead.websiteLink !== "No Website" && (
-                          <a
-                            href={lead.websiteLink.startsWith('http') ? lead.websiteLink : `https://${lead.websiteLink}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-blue-600 hover:underline flex items-center gap-1"
-                          >
-                            <span>🌐</span> Website
-                          </a>
-                        )}
-                        {lead.mapsLink && (
-                          <a
-                            href={lead.mapsLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-red-600 hover:underline flex items-center gap-1"
-                          >
-                            <span>📍</span> Google Maps
-                          </a>
-                        )}
-                        {!lead.websiteLink && !lead.mapsLink && (
-                          <span className="text-[10px] text-gray-400">No Links</span>
-                        )}
-                      </div>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                      {lead.phoneNumber || "No Phone"}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
-                        New
-                      </span>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                      {lead.email || "No Email"}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                      {lead.websiteLink && lead.websiteLink !== "No Website" ? (
+                        <a
+                          href={lead.websiteLink.startsWith('http') ? lead.websiteLink : `https://${lead.websiteLink}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        >
+                          Visit Website
+                        </a>
+                      ) : (
+                        "No Website"
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                      {lead.mapsLink ? (
+                        <a
+                          href={lead.mapsLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-800 hover:underline transition-colors"
+                        >
+                          <span>📍</span>
+                          Maps Link
+                        </a>
+                      ) : (
+                        "No Link"
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <div className="font-medium">
                         {new Date(lead.createdAt).toLocaleDateString()}
                       </div>
-                      <div className="text-[11px] text-gray-400">
+                      <div className="text-[10px] text-gray-400">
                         {new Date(lead.createdAt).toLocaleTimeString()}
                       </div>
                     </td>
