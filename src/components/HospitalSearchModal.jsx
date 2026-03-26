@@ -64,7 +64,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
       if (result.success) {
         setResults(result.results || []);
         if (result.results?.length === 0) {
-          setError("No hospitals found for this search");
+          setError("No  found for this search");
         }
       } else {
         throw new Error(result.error || "Failed to search hospitals");
@@ -354,7 +354,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                 🏥
               </div>
               <h3 className="text-lg font-semibold text-gray-900">
-                No hospitals found
+                No found
               </h3>
               <p className="text-gray-500 max-w-xs mx-auto">
                 We couldn't find any hospitals matching "{query}". Try a
