@@ -229,13 +229,14 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
 
           {!isLoading && results.length > 0 && (
             <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto">
+              <table className="min-w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="px-4 py-4 w-10">
+                    <th className="px-4 py-3 w-10 whitespace-nowrap">
                       <input
                         type="checkbox"
-                        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                         checked={
                           selectedIndices.length === results.length &&
                           results.length > 0
@@ -243,28 +244,28 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                         onChange={toggleSelectAll}
                       />
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                       SR NO
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[160px]">
                       NAME
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                       RATING
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[200px]">
                       ADDRESS
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[120px]">
                       PHONE
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[140px]">
                       EMAIL
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[110px]">
                       WEBSITE
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                    <th className="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[110px]">
                       GOOGLE LINK
                     </th>
                   </tr>
@@ -277,40 +278,40 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                       onClick={() => toggleSelectRow(index)}
                     >
                       <td
-                        className="px-4 py-4"
+                        className="px-4 py-3"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <input
                           type="checkbox"
-                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                           checked={selectedIndices.includes(index)}
                           onChange={() => toggleSelectRow(index)}
                         />
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 font-medium">
+                      <td className="px-4 py-3 text-sm text-gray-500 font-medium whitespace-nowrap">
                         {index + 1}
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
                         {hospital.name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                          ⭐ {hospital.rating}
+                          ⭐ {hospital.rating || "—"}
                         </span>
                       </td>
                       <td
-                        className="px-6 py-4 text-sm text-gray-600 truncate max-w-[200px]"
+                        className="px-4 py-3 text-sm text-gray-600 max-w-[220px] truncate"
                         title={hospital.address}
                       >
                         {hospital.address}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                      <td className="px-4 py-3 text-sm text-gray-600 font-medium whitespace-nowrap">
                         {hospital.phoneNumber || "No Phone"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                      <td className="px-4 py-3 text-sm text-gray-600 font-medium whitespace-nowrap">
                         {hospital.email || "No Email"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm font-medium whitespace-nowrap">
                         {hospital.websiteLink && hospital.websiteLink !== "No Website" ? (
                           <a
                             href={hospital.websiteLink.startsWith('http') ? hospital.websiteLink : `https://${hospital.websiteLink}`}
@@ -322,10 +323,10 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                             Visit Website
                           </a>
                         ) : (
-                          "No Website"
+                          <span className="text-gray-400">No Website</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                      <td className="px-4 py-3 text-sm font-medium whitespace-nowrap">
                         {hospital.mapsLink ? (
                           <a
                             href={hospital.mapsLink}
@@ -338,13 +339,14 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                             Maps Link
                           </a>
                         ) : (
-                          "No Link"
+                          <span className="text-gray-400">No Link</span>
                         )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
 

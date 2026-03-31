@@ -11,7 +11,7 @@ function App() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="flex-1 ml-[240px] flex flex-col min-h-screen">
+      <div className="flex-1 ml-[240px] flex flex-col min-h-screen overflow-x-hidden">
         <Header />
 
         <div className="flex-1 bg-gray-50">
