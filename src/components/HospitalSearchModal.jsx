@@ -146,14 +146,14 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all animate-in fade-in duration-200">
       <ToastMessage message={toast?.message} type={toast?.type} />
       <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
         {/* Header/Search Input */}
-        <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+        <div className="p-4 sm:p-5 border-b border-gray-100 bg-gray-50/50">
           <form
             onSubmit={handleSearchSubmit}
-            className="flex items-center gap-4"
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
           >
             <div className="relative flex-1 group">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
@@ -163,34 +163,36 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                 autoFocus
                 type="text"
                 placeholder="Search hospitals by name, area or city... (Press Enter to search)"
-                className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/80 focus:border-blue-500 outline-none transition-all text-sm sm:text-base text-gray-900 shadow-sm"
                 value={query}
                 onChange={handleQueryChange}
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading || query.trim().length < 2}
-              className={`px-8 py-3 bg-blue-600 text-white font-bold rounded-xl transition-all shadow-lg hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Searching...
-                </>
-              ) : (
-                "Search"
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 hover:bg-gray-200 rounded-lg transition-colors text-gray-500"
-              title="Close"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button
+                type="submit"
+                disabled={isLoading || query.trim().length < 2}
+                className="flex-1 sm:flex-none px-6 sm:px-10 py-3 bg-blue-400 text-white font-bold rounded-xl transition-all shadow-md hover:bg-blue-500 active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Searching
+                  </>
+                ) : (
+                  "Search"
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-3 w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-xl transition-colors text-gray-500 bg-white border border-gray-200"
+                title="Close"
+              >
+                <span className="text-xl">✕</span>
+              </button>
+            </div>
           </form>
         </div>
 

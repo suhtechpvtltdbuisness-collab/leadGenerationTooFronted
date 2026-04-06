@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, isOpen, onClose, onToggle }) => {
   const [recentLeads, setRecentLeads] = useState([]);
+  const [isHovered, setIsHovered] = useState(false);
 
   const fetchRecentLeads = async () => {
     try {
@@ -36,20 +37,54 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     { id: "analytics", icon: "📊", label: "Analytics" },
   ];
 
+  const isExpanded = isOpen || isHovered;
+
   return (
-    <div className="w-[240px] h-screen bg-white flex flex-col fixed left-0 top-0 overflow-hidden border-r border-gray-200">
+    <>
+    <div 
+      className={`h-screen bg-white flex flex-col fixed top-0 overflow-visible border-r border-gray-200 z-50 transition-all duration-300 ease-in-out ${
+        isExpanded 
+          ? 'left-0 w-[240px] shadow-2xl' 
+          : 'left-0 w-[70px] lg:w-[240px]'
+      }`}
+      onMouseEnter={() => window.innerWidth < 1024 && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Mobile/Tablet Toggle Arrow in Circle */}
+      <button
+        onClick={onToggle}
+        className={`lg:hidden absolute -right-3 top-6 w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg z-60 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+        title={isExpanded ? "Close Sidebar" : "Open Sidebar"}
+      >
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="16" 
+            height="16" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+        >
+            <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </button>
+
       {/* Header */}
-      <div className="px-4 py-4 flex items-center gap-2 flex-shrink-0">
-        <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">
+      <div className={`px-4 py-4 flex items-center gap-2 shrink-0 ${!isExpanded ? 'justify-center lg:justify-start' : ''}`}>
+        <div className="w-6 h-6 bg-blue-600 rounded shrink-0 flex items-center justify-center text-white text-xs font-bold">
           ⚡
         </div>
-        <span className="text-sm font-bold text-blue-600">LeadFlow</span>
+        <span className={`text-sm font-bold text-blue-600 transition-opacity duration-300 ${!isExpanded ? 'opacity-0 lg:opacity-100 hidden lg:block' : 'opacity-100 block'}`}>
+          LeadFlow
+        </span>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-2 overflow-y-auto scrollbar-hide">
         <div className="mb-4">
-          <div className="text-[10px] uppercase tracking-wider text-gray-400 font-bold px-3 mb-2">
+          <div className={`text-[10px] uppercase tracking-wider text-gray-400 font-bold px-3 mb-2 transition-opacity ${!isExpanded ? 'opacity-0 lg:opacity-100 hidden lg:block' : 'opacity-100 block'}`}>
             Menu
           </div>
           {menuItems.map((item) => (
@@ -59,17 +94,26 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                 activeTab === item.id
                   ? "bg-blue-600 text-white font-medium shadow-md shadow-blue-100"
                   : "text-gray-700 hover:bg-gray-50 font-normal"
-              }`}
-              onClick={() => setActiveTab(item.id)}
+              } ${!isExpanded ? 'justify-center lg:justify-start' : ''}`}
+              onClick={() => {
+                setActiveTab(item.id);
+                if (window.innerWidth < 1024) {
+                    onClose(); // Close if it was fully open
+                    setIsHovered(false);
+                }
+              }}
+              title={!isExpanded ? item.label : ""}
             >
-              <span className="text-sm w-4">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="text-sm shrink-0 w-4 flex justify-center">{item.icon}</span>
+              <span className={`transition-opacity duration-300 whitespace-nowrap ${!isExpanded ? 'opacity-0 lg:opacity-100 hidden lg:block' : 'opacity-100 block'}`}>
+                {item.label}
+              </span>
             </button>
           ))}
         </div>
 
-        {/* Recent Leads Section */}
-        <div className="mt-6">
+        {/* Recent Leads Section - Hide in Rail mode */}
+        <div className={`mt-6 transition-opacity duration-300 ${!isExpanded ? 'opacity-0 lg:opacity-100 hidden lg:block' : 'opacity-100 block'}`}>
           <div className="text-[10px] uppercase tracking-wider text-gray-400 font-bold px-3 mb-2 flex justify-between items-center">
             <span>Recent Leads</span>
             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
@@ -108,8 +152,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
       {/* Footer */}
       <div className="p-3 border-t border-gray-100">
-        {/* Onboarding Hub */}
-        <div className="bg-gray-50 rounded-lg p-3 mb-3 relative">
+        {/* Onboarding Hub - Hide in Rail mode */}
+        <div className={`bg-gray-50 rounded-lg p-3 mb-3 relative transition-opacity duration-300 ${!isExpanded ? 'opacity-0 lg:opacity-100 hidden lg:block' : 'opacity-100 block'}`}>
           <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-sm leading-none">
             ×
           </button>
@@ -128,19 +172,20 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         </div>
 
         {/* User Profile */}
-        <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+        <div className={`flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${!isExpanded ? 'justify-center lg:justify-start' : ''}`}>
           <img
             src="https://ui-avatars.com/api/?name=Samantha+Green&background=2563eb&color=fff&size=64"
             alt="User"
-            className="w-7 h-7 rounded-full"
+            className="w-7 h-7 rounded-full shrink-0"
           />
-          <span className="flex-1 text-[11px] font-medium text-gray-900">
+          <span className={`flex-1 text-[11px] font-medium text-gray-900 transition-opacity duration-300 ${!isExpanded ? 'opacity-0 lg:opacity-100 hidden lg:block' : 'opacity-100 block whitespace-nowrap'}`}>
             Samantha Green
           </span>
-          <span className="text-xs text-gray-400">›</span>
+          <span className={`text-xs text-gray-400 ${!isExpanded ? 'hidden lg:block' : 'block'}`}>›</span>
         </div>
       </div>
     </div>
+    </>
   );
 };
 
