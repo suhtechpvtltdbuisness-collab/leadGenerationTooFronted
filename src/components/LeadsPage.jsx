@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ToastMessage from "./ToastMessage";
+import { getLeads, deleteLead, bulkDeleteLeads } from "../service";
 
 const LeadsPage = () => {
   const [leads, setLeads] = useState([]);
@@ -26,16 +27,11 @@ const LeadsPage = () => {
 
   const fetchLeads = async () => {
     setIsLoading(true);
+    setError(null);
     setSelectedIds([]);
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-      const response = await fetch(`${baseUrl}/api/leads`);
-      const data = await response.json();
-      if (data.success) {
-        setLeads(data.leads || []);
-      } else {
-        throw new Error(data.error || "Failed to fetch leads");
-      }
+      const fetchedLeads = await getLeads();
+      setLeads(fetchedLeads || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -54,16 +50,7 @@ const LeadsPage = () => {
 
     setDeletingLeadId(leadId);
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-      const response = await fetch(`${baseUrl}/api/leads/${leadId}`, { method: "DELETE" });
-      const responseText = await response.text();
-      let result = null;
-      if (responseText) {
-        try { result = JSON.parse(responseText); } catch { result = null; }
-      }
-      if (!response.ok || (result && result.success === false)) {
-        throw new Error(result?.error || `Failed to delete lead (status: ${response.status})`);
-      }
+      await deleteLead(leadId);
       setLeads((prev) => prev.filter((item) => item._id !== leadId));
       setSelectedIds((prev) => prev.filter((id) => id !== leadId));
       showToast(`Lead "${lead.name}" deleted successfully.`, "success");
@@ -86,20 +73,7 @@ const LeadsPage = () => {
 
     setIsBulkDeleting(true);
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-      const response = await fetch(`${baseUrl}/api/leads`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: selectedIds }),
-      });
-
-      const result = await response.json().catch(() => null);
-
-      if (!response.ok || (result && result.success === false)) {
-        throw new Error(result?.error || `Server responded with ${response.status}`);
-      }
-
-      const deletedCount = result?.deletedCount ?? selectedIds.length;
+      const deletedCount = await bulkDeleteLeads(selectedIds);
       setLeads((prev) => prev.filter((lead) => !selectedIds.includes(lead._id)));
       setSelectedIds([]);
       showToast(`${deletedCount} lead${deletedCount > 1 ? "s" : ""} deleted successfully.`, "success");

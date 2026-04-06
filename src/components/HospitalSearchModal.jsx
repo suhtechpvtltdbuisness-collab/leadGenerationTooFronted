@@ -70,7 +70,14 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
         throw new Error(result.error || "Failed to search hospitals");
       }
     } catch (err) {
-      setError(err.message);
+      const rawMessage = err?.message || "Unknown error";
+      if (rawMessage.includes("Waiting for selector") || rawMessage.includes("selector`[role=\"article\"]` failed")) {
+        setError(
+          "Live Google search is temporarily unavailable. Please try again in a few minutes or refine your query.",
+        );
+      } else {
+        setError(rawMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +169,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
               <input
                 autoFocus
                 type="text"
-                placeholder="Search hospitals by name, area or city... (Press Enter to search)"
+                placeholder="Search  by name, area or city... (Press Enter to search)"
                 className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/80 focus:border-blue-500 outline-none transition-all text-sm sm:text-base text-gray-900 shadow-sm"
                 value={query}
                 onChange={handleQueryChange}
@@ -361,7 +368,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                 No found
               </h3>
               <p className="text-gray-500 max-w-xs mx-auto">
-                We couldn't find any hospitals matching "{query}". Try a
+                We couldn't find any  matching "{query}". Try a
                 different search term.
               </p>
             </div>
@@ -376,7 +383,7 @@ const HospitalSearchModal = ({ isOpen, onClose, onSelect }) => {
                 Start searching
               </h3>
               <p className="text-gray-500">
-                Type at least 2 characters to search for hospitals live.
+                Type at least 2 characters to search for things live.
               </p>
             </div>
           )}

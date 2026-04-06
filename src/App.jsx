@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
@@ -6,10 +6,38 @@ import LeadsPage from './components/LeadsPage';
 import TasksPage from './components/TasksPage';
 import HospitalSearchModal from './components/HospitalSearchModal';
 
+const VALID_TABS = ['dashboard', 'leads', 'tasks'];
+
+const getInitialTab = () => {
+  if (typeof window === 'undefined') return 'dashboard';
+  const hash = window.location.hash.replace('#', '').toLowerCase();
+  if (VALID_TABS.includes(hash)) return hash;
+  return 'dashboard';
+};
+
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (VALID_TABS.includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleSetActiveTab = (tab) => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      window.location.hash = tab;
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50 relative">
@@ -23,7 +51,7 @@ function App() {
 
       <Sidebar 
         activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+        setActiveTab={handleSetActiveTab} 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
