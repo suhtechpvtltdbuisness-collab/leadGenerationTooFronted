@@ -4,16 +4,37 @@ import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import LeadsPage from './components/LeadsPage';
 import TasksPage from './components/TasksPage';
+import HospitalSearchModal from './components/HospitalSearchModal';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="flex min-h-screen bg-gray-50 relative">
+      {/* Sidebar Overlay for Mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-      <div className="flex-1 ml-[240px] flex flex-col min-h-screen overflow-x-hidden">
-        <Header />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+      />
+
+      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden ml-[70px] lg:ml-[240px] transition-all duration-300">
+        <Header 
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+          isSidebarOpen={isSidebarOpen} 
+          onOpenSearch={() => setIsSearchOpen(true)}
+        />
 
         <div className="flex-1 bg-gray-50">
           {activeTab === 'dashboard' && <Dashboard />}
@@ -27,7 +48,7 @@ function App() {
           )}
         </div>
 
-        <footer className="bg-white border-t border-gray-200 px-8 py-4 flex justify-between items-center text-xs text-gray-500">
+        <footer className="bg-white border-t border-gray-200 px-8 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <p className="m-0">© 2026 LeadFlow. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#help" className="hover:text-gray-900 transition-colors no-underline">
@@ -39,6 +60,12 @@ function App() {
           </div>
         </footer>
       </div>
+
+      <HospitalSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelect={(hospital) => console.log('Selected:', hospital)}
+      />
     </div>
   );
 }

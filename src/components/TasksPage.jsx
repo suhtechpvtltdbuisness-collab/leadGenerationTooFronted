@@ -218,29 +218,29 @@ const TasksPage = () => {
      Render
   ──────────────────────────────────────────── */
   return (
-    <div className="p-8 min-h-screen bg-gray-50">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50">
       <ToastMessage message={toast?.message} type={toast?.type} />
 
       {/* ── Page Title ── */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Tasks Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Manage and track all your team tasks</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Tasks Dashboard</h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Manage and track all your team tasks</p>
       </div>
 
       {/* ── Stats Cards ── */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { label: "Total Tasks",      value: totalTasks,     icon: "☰",  iconBg: "bg-blue-50",   iconColor: "text-blue-600"  },
           { label: "New Tasks Today",  value: newToday,       icon: "📝", iconBg: "bg-green-50",  iconColor: "text-green-600" },
           { label: "In Progress",      value: inProgressCount,icon: "✉️", iconBg: "bg-yellow-50", iconColor: "text-yellow-600"},
           { label: "Completion Rate",  value: completionRate, icon: "🌐", iconBg: "bg-purple-50", iconColor: "text-purple-600"},
         ].map((card) => (
-          <div key={card.label} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-500 font-medium mb-1">{card.label}</p>
-              <p className="text-3xl font-bold text-gray-900">{card.value}</p>
+          <div key={card.label} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] sm:text-xs text-gray-500 font-medium mb-1 truncate">{card.label}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{card.value}</p>
             </div>
-            <div className={`w-10 h-10 ${card.iconBg} rounded-lg flex items-center justify-center text-lg ${card.iconColor}`}>
+            <div className={`shrink-0 w-8 h-8 sm:w-10 sm:h-10 ${card.iconBg} rounded-lg flex items-center justify-center text-base sm:text-lg ${card.iconColor} ml-2`}>
               {card.icon}
             </div>
           </div>
@@ -248,39 +248,39 @@ const TasksPage = () => {
       </div>
 
       {/* ── Action Toolbar ── */}
-      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap flex-1 min-w-[280px]">
           {/* Add Task */}
           <button
             onClick={openAdd}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 active:scale-95 transition-all shadow-sm"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 active:scale-95 transition-all shadow-sm"
           >
-            <span className="text-base">+</span> Add New Task
+            <span className="text-base">+</span> Add Task
           </button>
           {/* Import */}
           <button
             onClick={handleImport}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
           >
-            <span>⬇️</span> Import Tasks
+            <span>⬇️</span> Import
           </button>
           {/* Export */}
           <button
             onClick={handleExport}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
           >
             <span>⬆️</span> Export
           </button>
           {/* Filter dropdown */}
-          <div className="relative" ref={filterRef}>
+          <div className="relative flex-1 sm:flex-none" ref={filterRef}>
             <button
               onClick={() => setShowFilter(v => !v)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
+              className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
             >
               <span>🔽</span> Filter {filterStatus !== "All" && `(${filterStatus})`}
             </button>
             {showFilter && (
-              <div className="absolute left-0 top-10 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 min-w-[160px]">
+              <div className="absolute left-0 top-11 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 min-w-[160px]">
                 <p className="text-[10px] uppercase text-gray-400 font-bold mb-2 px-1">Status</p>
                 {["All", ...STATUS_OPTIONS].map(s => (
                   <button
@@ -299,17 +299,18 @@ const TasksPage = () => {
         </div>
 
         {/* Search */}
-        <div className="relative">
+        <div className="relative w-full sm:w-auto flex-1 max-w-full sm:max-w-[300px]">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
           <input
             type="text"
             placeholder="Search Tasks..."
             value={search}
             onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
-            className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm w-[220px]"
+            className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all"
           />
         </div>
       </div>
+
 
       {/* ── Bulk-delete bar ── */}
       {selectedIds.length > 0 && (
