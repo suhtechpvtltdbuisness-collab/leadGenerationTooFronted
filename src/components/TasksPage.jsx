@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ToastMessage from "./ToastMessage";
+import { getTasks, createTask, updateTask, deleteTask, bulkDeleteTasks, updateTasksStatusBulk } from "../service";
 
 /* ─────────────────────────────────────────────
    Utility helpers
@@ -45,7 +46,15 @@ const SEED_TASKS = [
 ];
 
 const BLANK_FORM = {
-  title: "", assignee: "", phone: "", email: "", dueDate: "", status: "To Do", priority: "Medium", source: "Referral",
+  title: "",
+  assignee: "",
+  phone: "",
+  email: "",
+  dueDate: "",
+  status: "To Do",
+  priority: "Medium",
+  source: "Referral",
+  notes: "",
 };
 
 const STATUS_OPTIONS   = ["To Do", "In Progress", "Done", "Cancelled"];
@@ -69,6 +78,10 @@ const TasksPage = () => {
   const [form,           setForm          ] = useState(BLANK_FORM);
   const [deletingId,     setDeletingId    ] = useState(null);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [isLoading,      setIsLoading     ] = useState(false);
+  const [error,          setError         ] = useState(null);
+  const [bulkStatus,     setBulkStatus    ] = useState("To Do");
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
   const filterRef = useRef(null);
 
   /* Auto-dismiss toast */
@@ -85,6 +98,26 @@ const TasksPage = () => {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  /* Initial fetch from backend */
+  useEffect(() => {
+    const loadTasks = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const remoteTasks = await getTasks();
+        if (Array.isArray(remoteTasks) && remoteTasks.length > 0) {
+          setTasks(remoteTasks);
+        }
+      } catch (err) {
+        setError(err.message || "Failed to load tasks from server");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTasks();
   }, []);
 
   const showToast = (message, type = "error") => setToast({ message, type });
@@ -144,6 +177,7 @@ const TasksPage = () => {
       status:   task.status,
       priority: task.priority,
       source:   task.source,
+      notes:    task.notes || "",
     });
     setShowModal(true);
   };
@@ -151,49 +185,95 @@ const TasksPage = () => {
   const handleFormChange = (field, value) =>
     setForm(prev => ({ ...prev, [field]: value }));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title.trim()) { showToast("Task title is required."); return; }
     if (!form.assignee.trim()) { showToast("Assignee is required."); return; }
     if (!form.dueDate) { showToast("Due date is required."); return; }
 
-    if (editingTask) {
-      setTasks(prev => prev.map(t =>
-        t._id === editingTask._id ? { ...t, ...form } : t
-      ));
-      showToast("Task updated successfully.", "success");
-    } else {
-      const newTask = { _id: `t${Date.now()}`, ...form };
-      setTasks(prev => [newTask, ...prev]);
-      showToast("Task added successfully.", "success");
+    try {
+      const payload = {
+        title: form.title.trim(),
+        assignee: form.assignee.trim(),
+        phone: form.phone || undefined,
+        email: form.email || undefined,
+        source: form.source,
+        dueDate: form.dueDate,
+        status: form.status,
+        priority: form.priority,
+        notes: form.notes?.trim() || "",
+      };
+
+      if (editingTask && editingTask._id) {
+        const updated = await updateTask(editingTask._id, payload);
+        const updatedTask = updated && updated._id ? updated : { ...editingTask, ...payload };
+        setTasks(prev => prev.map(t =>
+          t._id === editingTask._id ? updatedTask : t
+        ));
+        showToast("Task updated successfully.", "success");
+      } else {
+        const created = await createTask(payload);
+        const createdTask = created && created._id ? created : { _id: `t${Date.now()}`, ...payload };
+        setTasks(prev => [createdTask, ...prev]);
+        showToast("Task added successfully.", "success");
+      }
+      setShowModal(false);
+    } catch (err) {
+      showToast(err.message || "Failed to save task");
     }
-    setShowModal(false);
   };
 
   /* ── Single delete ── */
-  const handleDelete = (task) => {
-    if (!window.confirm(`Delete task "${task.title}"? This cannot be undone.`)) return;
+  const handleDelete = async (task) => {
     setDeletingId(task._id);
-    setTimeout(() => {
+    try {
+      await deleteTask(task._id);
       setTasks(prev => prev.filter(t => t._id !== task._id));
       setSelectedIds(prev => prev.filter(id => id !== task._id));
       showToast(`Task "${task.title}" deleted.`, "success");
+    } catch (err) {
+      showToast(err.message || "Failed to delete task");
+    } finally {
       setDeletingId(null);
-    }, 400);
+    }
   };
 
   /* ── Bulk delete ── */
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
     if (!window.confirm(`Delete ${selectedIds.length} selected task${selectedIds.length > 1 ? "s" : ""}? This cannot be undone.`)) return;
     setIsBulkDeleting(true);
-    setTimeout(() => {
+    try {
+      const deletedCount = await bulkDeleteTasks(selectedIds);
       setTasks(prev => prev.filter(t => !selectedIds.includes(t._id)));
-      const count = selectedIds.length;
       setSelectedIds([]);
-      showToast(`${count} task${count > 1 ? "s" : ""} deleted.`, "success");
-      setIsBulkDeleting(false);
+      showToast(`${deletedCount} task${deletedCount > 1 ? "s" : ""} deleted.`, "success");
       setCurrentPage(1);
-    }, 600);
+    } catch (err) {
+      showToast(err.message || "Failed to delete tasks");
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
+  /* ── Bulk status update (PATCH) ── */
+  const handleBulkStatusUpdate = async () => {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`Update status to "${bulkStatus}" for ${selectedIds.length} selected task${selectedIds.length > 1 ? "s" : ""}?`)) return;
+
+    setIsBulkUpdating(true);
+    try {
+      await updateTasksStatusBulk({ ids: selectedIds, status: bulkStatus });
+      setTasks(prev => prev.map(task =>
+        selectedIds.includes(task._id)
+          ? { ...task, status: bulkStatus }
+          : task
+      ));
+      showToast(`Updated ${selectedIds.length} task${selectedIds.length > 1 ? "s" : ""} to "${bulkStatus}".`, "success");
+    } catch (err) {
+      showToast(err.message || "Failed to update task status");
+    } finally {
+      setIsBulkUpdating(false);
+    }
   };
 
   /* ── Import / Export stubs ── */
@@ -312,20 +392,48 @@ const TasksPage = () => {
       </div>
 
 
-      {/* ── Bulk-delete bar ── */}
+      {/* ── Bulk actions bar ── */}
       {selectedIds.length > 0 && (
-        <div className="mb-4 px-5 py-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between shadow-sm">
-          <span className="text-sm font-semibold text-red-700">
-            🗑️ {selectedIds.length} task{selectedIds.length > 1 ? "s" : ""} selected
+        <div className="mb-4 px-5 py-3 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <span className="text-sm font-semibold text-blue-800">
+            ✨ {selectedIds.length} task{selectedIds.length > 1 ? "s" : ""} selected
           </span>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSelectedIds([])} className="text-sm text-gray-500 hover:text-gray-700 font-medium">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Bulk status update */}
+            <div className="flex items-center gap-2">
+              <select
+                value={bulkStatus}
+                onChange={e => setBulkStatus(e.target.value)}
+                className="px-3 py-1.5 border border-blue-200 rounded-lg text-xs sm:text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {STATUS_OPTIONS.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleBulkStatusUpdate}
+                disabled={isBulkUpdating}
+                className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-all shadow-md active:scale-95"
+              >
+                {isBulkUpdating ? (
+                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Updating...</>
+                ) : (
+                  <>Update Status</>
+                )}
+              </button>
+            </div>
+
+            {/* Divider */}
+            <span className="hidden sm:inline-block w-px h-6 bg-blue-200" />
+
+            {/* Bulk delete */}
+            <button onClick={() => setSelectedIds([])} className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 font-medium">
               Clear selection
             </button>
             <button
               onClick={handleBulkDelete}
               disabled={isBulkDeleting}
-              className="inline-flex items-center gap-2 px-5 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 disabled:opacity-50 transition-all shadow-md active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-1.5 bg-red-600 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-red-700 disabled:opacity-50 transition-all shadow-md active:scale-95"
             >
               {isBulkDeleting ? (
                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Deleting...</>
@@ -609,6 +717,7 @@ const TasksPage = () => {
                     value={form.phone}
                     onChange={e => handleFormChange("phone", e.target.value)}
                     placeholder="(555) 000-0000"
+                    maxLength={10}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -634,6 +743,18 @@ const TasksPage = () => {
                 >
                   {SOURCE_OPTIONS.map(s => <option key={s}>{s}</option>)}
                 </select>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={form.notes}
+                  onChange={e => handleFormChange("notes", e.target.value)}
+                  placeholder="Add any context or next steps for this task"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
               </div>
             </div>
 
