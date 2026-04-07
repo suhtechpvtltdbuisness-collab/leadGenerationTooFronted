@@ -1,9 +1,7 @@
 // Centralized API service for LeadFlow
 // All network calls should go through these helpers.
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://lead-generation-tool-backend.vercel.app";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 const buildUrl = (path) => {
   const base = API_BASE_URL.replace(/\/$/, "");
