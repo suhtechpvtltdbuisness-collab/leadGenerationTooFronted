@@ -2,7 +2,7 @@ import React from 'react';
 
 const LeadAnalysisCard = () => {
     return (
-        <div className="bg-white border border-gray-100 rounded-[2rem] p-6 shadow-sm flex flex-col h-full ring-1 ring-black/5">
+        <div className="bg-white border border-gray-100 rounded-4xl p-6 shadow-sm flex flex-col h-full ring-1 ring-black/5">
             {/* Header */}
             <div className="flex justify-between items-center mb-1">
                 <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ const LeadAnalysisCard = () => {
                     <span className="text-base font-black text-gray-700">4 <span className="text-gray-300 font-bold ml-1">(183)</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400">
-                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.828a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -55,7 +55,7 @@ const LeadAnalysisCard = () => {
                 <div className="h-full bg-[#10b981] rounded-full transition-all duration-1000 ease-out" style={{ width: '80%' }}></div>
             </div>
 
-            <div className="bg-[#f8faff] border border-[#eef2ff] rounded-[1.5rem] p-5 pt-8 relative mt-4 shadow-inner">
+            <div className="bg-[#f8faff] border border-[#eef2ff] rounded-3xl p-5 pt-8 relative mt-4 shadow-inner">
                 <div className="absolute top-0 transform -translate-y-1/2 left-8">
                     <span className="bg-[#1e293b] text-white text-[10px] font-black px-5 py-2 rounded-xl uppercase tracking-[0.15em] shadow-lg">AI Strategy</span>
                 </div>
@@ -85,7 +85,7 @@ const LeadAnalysisCard = () => {
 
             <div className="flex justify-between items-center mt-auto pt-6 border-t border-[#f1f5f9]">
                 <span className="text-[13px] font-black text-[#cbd5e1]">01/02/2026</span>
-                <span className="text-[13px] font-black text-[#6366f1] cursor-pointer hover:underline uppercase tracking-widest">Google Maps</span>
+                <a href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer" className="text-[13px] font-black text-[#6366f1] cursor-pointer hover:underline uppercase tracking-widest">Google Maps</a>
             </div>
         </div>
     );
